@@ -19,13 +19,34 @@ namespace FuzzyChess.Mathmatics
 
 
         public static Fuzzy And(this Fuzzy first, Fuzzy second) => first & second;
-        public static Func<TParameter, Fuzzy> And<TParameter>( this Fuzzy first, Func<TParameter, Fuzzy> second ) => ctx => first & second(ctx);
-        public static Func<TParameter, Fuzzy> And<TParameter>( this Func<TParameter, Fuzzy> first,  Fuzzy second ) => ctx => first(ctx) & second;
-  	    public static Func<TParameter, Fuzzy> And<TParameter>( this Func<TParameter, Fuzzy> first, Func<TParameter, Fuzzy> second ) => ctx => first(ctx) & second(ctx);
 
-        public static Func<TParameter, Fuzzy> And<TParameter>(this Func<TParameter, Fuzzy> first, Func<TParameter, bool> second) => ctx => first(ctx) & Fuzzy.Create(second(ctx));
+        public static Func<TParameter, Fuzzy> And<TParameter>(this Fuzzy first, Func<TParameter, Fuzzy> second) => ctx =>
+        {
+            if (first.IsZero)
+                return first;
 
+            return first & second(ctx);
+        };
 
+        public static Func<TParameter, Fuzzy> And<TParameter>(this Func<TParameter, Fuzzy> first, Fuzzy second) => ctx => first(ctx) & second;
+
+        public static Func<TParameter, Fuzzy> And<TParameter>(this Func<TParameter, Fuzzy> first, Func<TParameter, Fuzzy> second) => ctx =>
+        {
+            var firstVal = first(ctx);
+            if (firstVal.IsZero)
+                return firstVal;
+
+            return firstVal & second(ctx);
+        };
+
+        public static Func<TParameter, Fuzzy> And<TParameter>(this Func<TParameter, Fuzzy> first, Func<TParameter, bool> second) => ctx =>
+        {
+            var firstVal = first(ctx);
+            if (firstVal.IsZero)
+                return firstVal;
+
+            return firstVal & Fuzzy.Create(second(ctx));
+        };
 
         public static Fuzzy Or(this Fuzzy first, Fuzzy second) => first | second;
         public static Func<TParameter, Fuzzy> Or<TParameter>(this Fuzzy first, Func<TParameter, Fuzzy> second) => ctx => first | second(ctx);
